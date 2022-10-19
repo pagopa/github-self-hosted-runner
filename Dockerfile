@@ -63,7 +63,7 @@ RUN YQ_VERSION="v4.28.2" && \
 
 RUN useradd github && \
     mkdir -p /home/github && \
-    chown -R /home/github && \
+    chown -R github:github /home/github && \
     chown -R github:github /actions-runner
 
 COPY entrypoint.sh /entrypoint.sh
