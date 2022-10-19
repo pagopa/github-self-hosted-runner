@@ -27,22 +27,26 @@ jobs:
     runs-on: "ubuntu-22.04"
     steps:
       - name: Checkout code
-        uses: actions/checkout@1f9a0c22da41e6ebfa534300ef656657ea2c6707 # from https://github.com/actions/checkout/commits/main
+        # from https://github.com/actions/checkout/commits/main
+        uses: actions/checkout@1f9a0c22da41e6ebfa534300ef656657ea2c6707
 
       - name: Build an image from Dockerfile
         run: |
           docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@d63413b0a4a4482237085319f7f4a1ce99a8f2ac # from https://github.com/aquasecurity/trivy-action/commits/master
+        # from https://github.com/aquasecurity/trivy-action/commits/master
+        uses: aquasecurity/trivy-action@d63413b0a4a4482237085319f7f4a1ce99a8f2ac
         with:
           image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
+          timeout: '10m0s'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@f0a12816612c7306b485a22cb164feb43c6df818 # from https://github.com/github/codeql-action/commits/main
+        # from https://github.com/github/codeql-action/commits/main
+        uses: github/codeql-action/upload-sarif@f0a12816612c7306b485a22cb164feb43c6df818
         with:
           sarif_file: 'trivy-results.sarif'
