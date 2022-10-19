@@ -28,9 +28,8 @@ RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor |
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee /etc/apt/sources.list.d/azure-cli.list
 
 RUN apt-get -y update && apt-get -y install azure-cli
-RUN az extension add --name containerapp --system && \
-    az extension add --name aks-preview --system && \
-    az extension add --name account --system
+
+RUN az config set extension.use_dynamic_install=yes_without_prompt
 
 # install python-pip
 
@@ -50,12 +49,15 @@ RUN curl https://baltocdn.com/helm/signing.asc | apt-key add - && \
 
 RUN apt-get -y update && apt-get -y install helm
 
+# install jq from https://stedolan.github.io/jq/download/
+
+RUN apt-get -y update && apt-get -y install jq
+
 # install yq from https://github.com/mikefarah/yq#install
 
 RUN YQ_VERSION="v4.28.2" && \
     YQ_BINARY="yq_linux_amd64" && \
-    wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - | tar xz && mv ${YQ_BINARY} /usr/bin/yq && \
-    yq --version
+    wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - | tar xz && mv ${YQ_BINARY} /usr/bin/yq
 
 ####
 
@@ -68,5 +70,11 @@ RUN chmod +x /entrypoint.sh
 USER github
 
 WORKDIR /
+
+RUN whoami && \
+    az --version && \
+    kubectl --help && \
+    helm --help && \
+    yq --version
 
 ENTRYPOINT ["/entrypoint.sh"]
